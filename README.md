@@ -1,11 +1,19 @@
 # Top Log Calculator
 A simple script that will calculate the average CPU usage and maximum CPU usage when provided with a top log.
 
+#### Execute Script
 ```shell
 python3 calculate.py top_log.txt
 ```
+#### Sample Output
+```text
+Average CPU Usage: 10.63%
+Maximum CPU Usage: 33.30%
+```
 
-### Top Log Command
+## Logging
+
+#### Top Log Command
 
 The regex used to parse top logs is designed around the top output logged by the following command. Don't expect it to work with other top outputs.
 
@@ -14,7 +22,7 @@ while ( sleep 60 ) ; do (printf "\n\n\n" && date +"[%d-%m-%y %T]" \
 && / top -bn 1 -o %CPU | head -n 15 && printf "\n\n\n") >> top_log.txt ; done
 ```
 
-### Sample Top Log Output
+#### Sample Top Log Output
 ```text
 [30-07-21 16:31:49]
 top - 16:31:49 up 2 days, 23:24,  2 users,  load average: 0.05, 0.
