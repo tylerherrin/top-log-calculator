@@ -26,25 +26,33 @@ import re
 
 try:
     file_path = sys.argv[1]
+    try:
+        with open(sys.argv[1], "r") as top_log_file:
+            top_log_string = top_log_file.read()
+    except FileNotFoundError:
+        print(file_path + " does not exist! Exiting!")
+        exit(1)
 except IndexError:
     print("No filepath provided! Exiting!")
     exit(1)
 
 # Regex used to match relevant %CPU values.
-line_regex = re.compile(r"\d+\s+\w+\+*\s+-*\d+\s+\d+\s+\d+\s+\d+\s+\d+\s+\w\s+(?!0\.0)(\d+\.?\d*)")
-
-try:
-    with open(sys.argv[1], "r") as top_log_file:
-        top_log_string = top_log_file.read()
-except FileNotFoundError:
-    print(file_path + " does not exist! Exiting!")
-    exit(1)
-
+line_regex = re.compile(r"(PID\sUSER.*)?\s*\d+\s+\w+\+?\s+-?\d+\s+-?\d+\s+\d+(?:\.\d+\D)?\s+\d+\s+\d+\s+\w\s+(?!0\.0)(\d+\.?\d*)")
 cpu_values = line_regex.findall(top_log_string)
-for index, value in enumerate(cpu_values):
-    cpu_values[index] = float(value)
 
-avg_cpu = format(sum(cpu_values) / len(cpu_values), ".2f")
-max_cpu = format(max(cpu_values), ".2f")
+samples = []
+sample_values = []
+for index, values in enumerate(cpu_values):
+    if values[0] and index != 0:
+        samples.append(sample_values)
+        sample_values = []
+    sample_values.append(float(values[1]))
+
+sample_averages = []
+for values in samples:
+    sample_averages.append(sum(values) / len(values))
+
+avg_cpu = format(sum(sample_averages) / len(sample_averages), ".2f")
+max_cpu = format(max(sample_averages), ".2f")
 print("Average CPU Usage: " + avg_cpu + "%")
 print("Maximum CPU Usage: " + max_cpu + "%")
